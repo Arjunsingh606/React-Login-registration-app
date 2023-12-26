@@ -1,0 +1,52 @@
+{
+  "user": [
+    {
+      "firstName": "Garth",
+      "lastName": "Mccoy",
+      "email": "kobeqe@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "roles": "Admin",
+      "id": 29
+    },
+    {
+      "firstName": "Ali",
+      "lastName": "Rice",
+      "email": "vofyruvu@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "roles": "Admin",
+      "id": 31
+    },
+    {
+      "firstName": "Ali",
+      "lastName": "Rice",
+      "email": "vofyruvu@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "roles": "Admin",
+      "id": 32
+    },
+    {
+      "firstName": "Ciara",
+      "lastName": "Pennington",
+      "email": "beqabyfoj@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "roles": "Admin",
+      "id": 33
+    },
+    {
+      "firstName": "Ciara",
+      "lastName": "Pennington",
+      "email": "beqabyfoj@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "roles": "Admin",
+      "id": 34
+    },
+    {
+      "firstName": "Arjun ",
+      "lastName": "singh",
+      "email": "rozidudy@mailinator.com",
+      "password": "Singh@123",
+      "roles": "User",
+      "id": 37
+    }
+  ]
+}

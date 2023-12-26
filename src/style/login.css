@@ -1,0 +1,27 @@
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #eaeaea;
+}
+.form-field {
+  text-align: left;
+}
+.password-title {
+  display: flex;
+  justify-content: space-between;
+}
+.password-title a {
+  color: #d99674;
+}
+.sign-up-link a {
+  color: #d99674;
+}
+.btn.form-btn {
+  background-color: #c15722;
+  border: none;
+  width: -webkit-fill-available;
+}
+.btn.form-btn:hover{
+  background-color: #db8942;
+}
