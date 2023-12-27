@@ -21,11 +21,11 @@ const Login: React.FC<formBannerProps> = (props) => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(login({ email, password }));
-    console.log("logged in");
+    console.log(dispatch(login({ email, password })) ,"logged in");
 
-    if (loggedIn) {
-      window.location.href = "/signUp";
-    }
+    // if (loggedIn) {
+    //   window.location.href = "/signUp";
+    // }
   };
   useEffect(() => {
     if (loggedIn) {

@@ -13,26 +13,15 @@ interface UserState {
   data: UserForm[] | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | undefined;
+  otp: string | null;
 }
 
 const initialState: UserState = {
   data: [],
   status: "idle",
   error:"" ,
+  otp:""
 };
-
-
-
-// get user data from api
-export const getUsers = createAsyncThunk("getUsers", async () => {
-  try {
-    const response = await fetch("http://localhost:3001/user");
-    const getData = response.json();
-    return getData;
-  } catch (error) {
-    console.log("Error", error);
-  }
-});
 
 
 // post user data at api
@@ -72,6 +61,28 @@ const userSlice = createSlice({
         state.error = "Invalid credentials";
       }
     },
+    forgetPassword:(state, action:PayloadAction<UserForm>)=>{
+      const {email} = action.payload;
+      const userEmail =  state.data?.find((u) => u.email === email)
+      if(userEmail){
+        state.data = [userEmail];
+        state.status = "succeeded";
+      } else {
+        state.status = "failed";
+        state.error = "Invalid credentials";
+      }
+    },
+    // verifyOtp: (state, action: PayloadAction<string>) => {
+    //   const enteredOtp = action.payload;
+
+    //   if (state.otp === enteredOtp) {
+    //     state.status = "succeeded";
+    //     state.otp = null;
+    //   } else {
+    //     state.status = "failed";
+    //     state.error = "Invalid OTP";
+    //   }
+    // },
   },
   extraReducers: (builder) => {
     builder.addCase(userPostData.pending, (state) => {
@@ -85,22 +96,12 @@ const userSlice = createSlice({
       state.status = "failed";
       state.error = action.error.message;
     });
-    builder.addCase(getUsers.pending, (state) => {
-      state.status = "loading";
-    });
-    builder.addCase(getUsers.fulfilled, (state, action:PayloadAction<UserForm[]>) => {
-      state.status = "succeeded";
-      state.data = action.payload;
-    });
-    builder.addCase(getUsers.rejected, (state, action) => {
-      console.log("Error", action.payload);
-      state.error = action.error.message;
-    });
+   
   },
  
 });
 
-export const { setUser, login } = userSlice.actions;
+export const { setUser, login, forgetPassword } = userSlice.actions;
 export default userSlice.reducer;
 
 

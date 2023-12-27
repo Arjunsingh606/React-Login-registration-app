@@ -9,6 +9,13 @@ interface formBannerProps{
 }
 
 const Otp:React.FC<formBannerProps> = (props) => {
+
+  const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
+
+
   return (
     <>
      <div className="container ">
