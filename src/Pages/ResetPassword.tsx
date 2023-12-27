@@ -1,18 +1,25 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import "../style/login.css";
+import "../style/login.css"
+import { Link } from "react-router-dom";
 
-const ResetPassword = (props) => {
+interface formBannerProps{
+  image:string
+}
+
+
+const ResetPassword:React.FC<formBannerProps>= (props) => {
   return (
     <>
       <div className="container ">
         <div className="row">
-          <div className="form-wrapper">
-            <div className="col-md-5 form-banner">
+          <div className="col form-wrapper">
+            <div className=" form-banner">
               <img src={props.image} alt="loading"></img>
             </div>
-            <Form className=" col-md-4">
+            <div className="col-md-5 main-form">
+            <Form >
               <h3 className="text-start">Reset Password</h3>
 
               <Form.Group
@@ -43,12 +50,14 @@ const ResetPassword = (props) => {
               <div className="sign-up-link">
                 <p>
                   Not a member?
-                  <a href="forget.html" class="link-underline-light ">
-                    Sign up now
-                  </a>
+                 
+                   <span><Link to="/signUp"> Sign up</Link></span>
+                 
                 </p>
               </div>
             </Form>
+            </div>
+            
           </div>
         </div>
       </div>

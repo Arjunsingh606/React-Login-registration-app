@@ -1,47 +1,48 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import { useAppDispatch , useAppSelector} from "../store/hooks";
+// import { setUser } from '../store/userSlice';
+import { userPostData } from "../store/userSlice";
+// import { UserForm } from "../store/userSlice";
 import "../style/login.css";
+import { Link } from "react-router-dom";
 
-const SignUp = (props) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
-  const [user, setUser] = useState([{
-    firstName: "",
-    lastName: "",
-    email: "",
-    confirmPassword: "",
-  }]);
+interface formBannerProps{
+  image:string,
+}
 
-  const handleSubmitBtn = (e) => {
+const SignUp:React.FC<formBannerProps> = (props) => {
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPass, setConfirmPass] = useState<string>("");
+  const dispatch = useAppDispatch();
+
+  const handleSubmitBtn = async (e:React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    const formData = [
-      {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        confirmPass: confirmPass,
-      },
-    ];
-    setUser(formData);
-    console.log(user, "form data");
+    const formData:any= { firstName, lastName, email, password, confirmPass };
+    // dispatch(setUser(formData)); 
+    try {
+      await dispatch(userPostData(formData)); 
+      console.log(formData, 'Data saved successfully');
+    } catch (error) {
+      console.error('----Error while saving data----:', error);
+    }
   };
 
   return (
     <>
       <div className="container ">
         <div className="row">
-          <div className="form-wrapper">
-            <div className="col-md-5 form-banner">
-              <img src={props.image} alt="loading"></img>
+          <div className="col form-wrapper">
+            <div className="form-banner">
+              <img className="img-fluid" src={props.image} alt="loading"></img>
             </div>
-            <Form className=" col-md-4">
+            <div className="col-md-5 main-form">
+            <Form className=" ">
               <h3 className="text-start">SignUp</h3>
-
               <Form.Group className="mb-3 form-field">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
@@ -52,7 +53,6 @@ const SignUp = (props) => {
                   placeholder=""
                 />
               </Form.Group>
-
               <Form.Group className="mb-3 form-field">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
@@ -63,7 +63,6 @@ const SignUp = (props) => {
                   placeholder=""
                 />
               </Form.Group>
-
               <Form.Group className="mb-3 form-field">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -74,7 +73,6 @@ const SignUp = (props) => {
                   placeholder="xyz@gmail.com"
                 />
               </Form.Group>
-
               <Form.Group className="mb-3 form-field">
                 <Form.Label>Password</Form.Label>
                 <Form.Control
@@ -82,10 +80,9 @@ const SignUp = (props) => {
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
                   name="password"
-                  placeholder="Password"
+                  placeholder=""
                 />
               </Form.Group>
-
               <Form.Group className="mb-3 form-field">
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control
@@ -93,10 +90,9 @@ const SignUp = (props) => {
                   onChange={(e) => setConfirmPass(e.target.value)}
                   type="password"
                   name="confirm-password"
-                  placeholder="Password"
+                  placeholder=""
                 />
               </Form.Group>
-
               <Button
                 onClick={handleSubmitBtn}
                 className="form-btn"
@@ -106,14 +102,14 @@ const SignUp = (props) => {
                 Sign Up
               </Button>
               <div className="sign-up-link">
-                <p>
+               
                   Already a member?
-                  <a href="forget.html" class="link-underline-light ">
-                    Login now
-                  </a>
-                </p>
+                 <span><Link to="/"> Login now </Link></span>
+             
               </div>
             </Form>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -122,3 +118,29 @@ const SignUp = (props) => {
 };
 
 export default SignUp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
