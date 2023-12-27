@@ -2,11 +2,11 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
  export interface UserForm {
   id?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPass: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  confirmPass?: string;
 }
 
 interface UserState {
@@ -57,12 +57,21 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    // setUser: (state, action: PayloadAction<UserForm[]>) => {
-    //   state.data = action.payload;
-    // },
-    // login:(state,action)=>{
-      
-    // }
+    setUser: (state, action: PayloadAction<UserForm[]>) => {
+      state.data = action.payload;
+    },
+    login: (state, action: PayloadAction<UserForm>) => {
+      const { email, password } = action.payload;
+      const user = state.data?.find((u) => u.email === email && u.password === password);
+
+      if (user) {
+        state.data = [user];
+        state.status = "succeeded";
+      } else {
+        state.status = "failed";
+        state.error = "Invalid credentials";
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(userPostData.pending, (state) => {
@@ -91,7 +100,7 @@ const userSlice = createSlice({
  
 });
 
-// export const { setUser } = userSlice.actions;
+export const { setUser, login } = userSlice.actions;
 export default userSlice.reducer;
 
 

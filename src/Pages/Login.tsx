@@ -3,15 +3,36 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "../style/login.css";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login, UserForm } from "../store/userSlice";
+import { RootState } from '../store/store'
 
 interface formBannerProps {
   image: string;
 }
 const Login: React.FC<formBannerProps> = (props) => {
+  const loggedIn = useSelector((state: RootState) => state.user.status === "succeeded");
 
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const dispatch = useDispatch();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(login({ email, password }));
+    console.log("logged in");
+
+    if (loggedIn) {
+      window.location.href = "/signUp";
+    }
+  };
+  useEffect(() => {
+    if (loggedIn) {
+      window.location.href = "/signUp";
+    }
+  }, [loggedIn]);
+
 
   return (
     <>
@@ -61,7 +82,7 @@ const Login: React.FC<formBannerProps> = (props) => {
                   />
                 </Form.Group>
 
-                <Button className="form-btn" variant="primary" type="submit">
+                <Button onClick={handleLogin} className="form-btn" variant="primary" type="submit">
                   Login
                 </Button>
                 <div className="sign-up-link">
