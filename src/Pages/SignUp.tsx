@@ -24,20 +24,15 @@ const SignUp:React.FC<formBannerProps> = (props) => {
     e.preventDefault();
     const formData:any= { firstName, lastName, email, password, confirmPass };
     // dispatch(setUser(formData)); 
-    try {
+  
       await dispatch(userPostData(formData)); 
       console.log(formData, 'Data saved successfully');
-    } catch (error) {
-      console.error('----Error while saving data----:', error);
-    }
+    
     setFirstName("")
     setLastName("")
     setEmail("")
     setPassword("")
     setConfirmPass("")
-    setTimeout(()=>{
-      alert("You have successfully registered ! You can login !!")
-    }, 1000)
     
   };
   
