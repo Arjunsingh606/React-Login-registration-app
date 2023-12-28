@@ -38,7 +38,7 @@ export const getUsers = createAsyncThunk("getUsersData", async () => {
 // post user data at api
 export const userPostData = createAsyncThunk("userdata", async (requestData: UserForm) => {
   try {
-    const response = await fetch("http://localhost:31/user", {
+    const response = await fetch("http://localhost:3001/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,9 +57,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserForm[]>) => {
-      state.data = action.payload;
-    },
+    // setUser: (state, action: PayloadAction<UserForm[]>) => {
+    //   state.data = action.payload;
+    // },
     login: (state, action: PayloadAction<UserForm>) => {
       const { email, password } = action.payload;
       const loginUser = state.data?.filter((user) => user.email === email && user.password === password);
@@ -110,7 +110,7 @@ const userSlice = createSlice({
  
 });
 
-export const { setUser, login, forgetPassword } = userSlice.actions;
+export const {  login, forgetPassword } = userSlice.actions;
 export default userSlice.reducer;
 
 

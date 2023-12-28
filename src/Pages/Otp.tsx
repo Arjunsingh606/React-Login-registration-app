@@ -18,22 +18,19 @@ const Otp: React.FC<formBannerProps> = (props) => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
   const getotp = generateOtp();
-  console.log(getotp, "getotp");
-
+ 
   const handleSubmitOtp = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (input.current !== null) {
       const name = input.current.value;
       if (name === getotp) {
-        console.log("otp matched");
+        window.location.href = "/resetPassword";
       } else {
         console.log("enter correct otp")
       }
     }
   };
-
-
 
   return (
     <>

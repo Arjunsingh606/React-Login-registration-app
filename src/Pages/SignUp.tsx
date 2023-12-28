@@ -30,7 +30,17 @@ const SignUp:React.FC<formBannerProps> = (props) => {
     } catch (error) {
       console.error('----Error while saving data----:', error);
     }
+    setFirstName("")
+    setLastName("")
+    setEmail("")
+    setPassword("")
+    setConfirmPass("")
+    setTimeout(()=>{
+      alert("You have successfully registered ! You can login !!")
+    }, 1000)
+    
   };
+  
 
   return (
     <>
@@ -40,7 +50,7 @@ const SignUp:React.FC<formBannerProps> = (props) => {
             <div className="form-banner">
               <img className="img-fluid" src={props.image} alt="loading"></img>
             </div>
-            <div className="col-md-5 main-form">
+            <div className="col-md-3 main-form">
             <Form className=" ">
               <h3 className="text-start">SignUp</h3>
               <Form.Group className="mb-3 form-field">

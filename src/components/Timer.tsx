@@ -20,14 +20,12 @@ const Timer:React.FC<timerFunction> = (props) => {
         }
     };
 
-
     return (
         <>
             <div className="timer-text">
                 <p>Time remaining : {timer}</p>
                 { timer === 0 ? <button onClick={resetTimer}>Resend Otp</button>: ""}
             </div>
-
         </>
     )
 }

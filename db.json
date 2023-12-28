@@ -1,84 +1,12 @@
 {
   "user": [
     {
-      "firstName": "Rahul ",
-      "lastName": "Savaliya",
-      "email": "rahul@gmail.com",
-      "password": "aaaaa",
-      "confirmPass": "aaaa",
-      "id": 39
-    },
-    {
-      "firstName": "Arjun ",
-      "lastName": "Singh",
-      "email": "singharjun.u@gmail.com",
-      "password": "asdeds",
-      "confirmPass": "asdesd",
-      "id": 40
-    },
-    {
       "firstName": "Pace",
       "lastName": "Burks",
       "email": "hefycute@mailinator.com",
       "password": "Pa$$w0rd!",
       "confirmPass": "Pa$$w0rd!",
       "id": 41
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 42
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 43
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 44
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 45
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 46
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 47
-    },
-    {
-      "firstName": "",
-      "lastName": "",
-      "email": "",
-      "password": "",
-      "confirmPass": "",
-      "id": 48
     },
     {
       "firstName": "Arjun",
@@ -95,6 +23,70 @@
       "password": "aaaaa",
       "confirmPass": "aswdwedew",
       "id": 50
+    },
+    {
+      "firstName": "Whitfield",
+      "lastName": "Avila",
+      "email": "woxe@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 51
+    },
+    {
+      "firstName": "Whitfield",
+      "lastName": "Avila",
+      "email": "woxe@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 52
+    },
+    {
+      "firstName": "Hale",
+      "lastName": "Duncan",
+      "email": "jobowy@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 53
+    },
+    {
+      "firstName": "Washington",
+      "lastName": "Barnett",
+      "email": "mesevoduty@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 54
+    },
+    {
+      "firstName": "Winters",
+      "lastName": "Bates",
+      "email": "lydyp@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 55
+    },
+    {
+      "firstName": "Witt",
+      "lastName": "Mckenzie",
+      "email": "fofuloja@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 56
+    },
+    {
+      "firstName": "Kane",
+      "lastName": "Guy",
+      "email": "zazody@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 57
+    },
+    {
+      "firstName": "Hanson",
+      "lastName": "Leonard",
+      "email": "sawefexol@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "confirmPass": "Pa$$w0rd!",
+      "id": 58
     }
   ]
 }
