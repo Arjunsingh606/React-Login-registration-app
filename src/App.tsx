@@ -6,6 +6,7 @@ import Otp from './Pages/Otp';
 import ResetPassword from "./Pages/ResetPassword";
 import formBanner from './banner/form-banner.png'
 import { Routes, Route } from "react-router-dom";
+import Home from './components/Home'
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Route path="/forgetPassword" element={<ForgetPassword image={formBanner} />} />
         <Route path="/otp" element={<Otp image={formBanner} />} />
         <Route path="/resetPassword" element={<ResetPassword image={formBanner} />} />
+        <Route path="/home" element={<Home/>} />
       </Routes>
     </>
   );

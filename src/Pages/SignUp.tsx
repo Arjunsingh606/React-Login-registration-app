@@ -34,7 +34,7 @@ const SignUp:React.FC<formBannerProps> = (props) => {
 
   return (
     <>
-      <div className="container ">
+      <div className="container-fluid ">
         <div className="row">
           <div className="col form-wrapper">
             <div className="form-banner">

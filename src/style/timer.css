@@ -1,0 +1,13 @@
+.timer-text{
+    display: flex;
+    justify-content: space-between;
+    align-items:flex-start;
+}
+
+.timer-text button{
+    border: none;
+    background-color: antiquewhite;
+    border-radius: 5px;
+    padding: 4px 15px;
+
+}

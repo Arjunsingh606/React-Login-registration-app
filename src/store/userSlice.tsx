@@ -2,11 +2,11 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
  export interface UserForm {
   id?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPass: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  confirmPass?: string;
 }
 
 interface UserState {
@@ -23,8 +23,8 @@ const initialState: UserState = {
 
 
 
-// get user data from api
-export const getUsers = createAsyncThunk("getUsers", async () => {
+// // get user data from api
+export const getUsers = createAsyncThunk("getUsersData", async () => {
   try {
     const response = await fetch("http://localhost:3001/user");
     const getData = response.json();
@@ -38,7 +38,7 @@ export const getUsers = createAsyncThunk("getUsers", async () => {
 // post user data at api
 export const userPostData = createAsyncThunk("userdata", async (requestData: UserForm) => {
   try {
-    const response = await fetch("http://localhost:3001/user", {
+    const response = await fetch("http://localhost:31/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,12 +57,31 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    // setUser: (state, action: PayloadAction<UserForm[]>) => {
-    //   state.data = action.payload;
-    // },
-    // login:(state,action)=>{
-      
-    // }
+    setUser: (state, action: PayloadAction<UserForm[]>) => {
+      state.data = action.payload;
+    },
+    login: (state, action: PayloadAction<UserForm>) => {
+      const { email, password } = action.payload;
+      const loginUser = state.data?.filter((user) => user.email === email && user.password === password);
+
+      if (loginUser) {
+        // state.data = [loginUser];
+        state.status = "succeeded";
+      } else {
+        state.status = "failed";
+        state.error = "Invalid credentials";
+      }
+    },
+    forgetPassword:(state,action:PayloadAction<UserForm>)=>{
+      const {email} = action.payload;
+      const existEmail = state.data?.filter((user)=> user.email === email);
+      if(existEmail){
+        state.status = "succeeded"
+      }else{
+        state.status = "failed";
+        state.error = "Invalid credentials";
+      }
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(userPostData.pending, (state) => {
@@ -91,7 +110,7 @@ const userSlice = createSlice({
  
 });
 
-// export const { setUser } = userSlice.actions;
+export const { setUser, login, forgetPassword } = userSlice.actions;
 export default userSlice.reducer;
 
 
