@@ -1,49 +1,55 @@
-import React from "react";
+// Login.tsx
+import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import "../style/login.css";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, UserForm } from "../store/userSlice";
-import { RootState } from '../store/store'
+import { login, UserForm, userPostData } from "../store/userSlice";
+
+import { RootState } from "../store/store";
 
 interface formBannerProps {
   image: string;
 }
+
 const Login: React.FC<formBannerProps> = (props) => {
-  const loggedIn = useSelector((state: RootState) => state.user.status === "succeeded");
+    const loggedIn = useSelector((state: RootState) => state.user.status === "succeeded");
+    const dispatch = useDispatch();
+  
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+  
+    const handleLogin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      const loggedInUser= { email, password }
+      console.log("login");
+      
+        await dispatch(login(loggedInUser));
+    
+    };
+   
+    const user = useSelector((state: RootState) => state.user.user);
+    useEffect(() => {
+      if (loggedIn) {
+        sessionStorage.setItem("item_key", email);
+        sessionStorage.setItem("item_key", password);
 
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const dispatch = useDispatch();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(login({ email, password }));
-    console.log(dispatch(login({ email, password })) ,"logged in");
-
-    // if (loggedIn) {
-    //   window.location.href = "/signUp";
-    // }
-  };
-  useEffect(() => {
-    if (loggedIn) {
-      window.location.href = "/signUp";
-    }
-  }, [loggedIn]);
+        window.location.href = "/signUp";
+      }
+    }, [loggedIn,email, password]);
 
 
   return (
     <>
-      <div className="container ">
+      <div className="container">
         <div className="row">
           <div className="col form-wrapper">
             <div className=" form-banner">
-              <img src={props.image} alt="loading"></img>
+              <img src={props.image} alt="loading" />
             </div>
             <div className="col-md-5 main-form">
-              <Form >
+              <Form>
                 <h3 className="text-start">Login</h3>
                 <p className="text-start border-bottom">
                   Enter your credentials to access your account
@@ -82,18 +88,24 @@ const Login: React.FC<formBannerProps> = (props) => {
                   />
                 </Form.Group>
 
-                <Button onClick={handleLogin} className="form-btn" variant="primary" type="submit">
+                <Button
+                  onClick={handleLogin}
+                  className="form-btn"
+                  variant="primary"
+                  type="submit"
+                >
                   Login
                 </Button>
                 <div className="sign-up-link">
                   <p>
                     Not a member?
-                    <span><Link to="/signUp"> Sign up</Link></span>
+                    <span>
+                      <Link to="/signUp"> Sign up</Link>
+                    </span>
                   </p>
                 </div>
               </Form>
             </div>
-
           </div>
         </div>
       </div>
@@ -102,3 +114,28 @@ const Login: React.FC<formBannerProps> = (props) => {
 };
 
 export default Login;
+
+// const dispatch = useDispatch();
+// const { users, status } = useSelector((state: RootState) => state.user);
+
+// useEffect(() => {
+//   dispatch(userFetchData());
+// }, [dispatch]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
