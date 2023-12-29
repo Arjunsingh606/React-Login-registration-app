@@ -1,13 +1,33 @@
-import React, { useState, useEffect } from "react";
+const validate = (values) => {
+    const errors = {};
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    if (!values.username) {
+      errors.username = "Username is required!";
+    }
+    if (!values.email) {
+      errors.email = "Email is required!";
+    } else if (!regex.test(values.email)) {
+      errors.email = "This is not a valid email format!";
+    }
+    if (!values.password) {
+      errors.password = "Password is required";
+    } else if (values.password.length < 4) {
+      errors.password = "Password must be more than 4 characters";
+    } else if (values.password.length > 10) {
+      errors.password = "Password cannot exceed more than 10 characters";
+    }
+
+
+    //
+
+
+    import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { useAppDispatch } from "../store/hooks";
 import { userPostData } from "../store/userSlice";
 import "../style/login.css";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { getUsers } from "../store/userSlice";
 
 interface formBannerProps {
   image: string;
@@ -20,56 +40,32 @@ const SignUp: React.FC<formBannerProps> = (props) => {
   const [password, setPassword] = useState<string>("");
   const [confirmPass, setConfirmPass] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { data, status } = useSelector((state: RootState) => state.user);
-
-  useEffect(() => {
-    dispatch(getUsers());
-  }, [getUsers]);
-
   const dispatch = useAppDispatch();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
     if (!firstName.trim()) {
       newErrors.firstName = "First Name is required";
     }
+
     if (!lastName.trim()) {
       newErrors.lastName = "Last Name is required";
     }
+
     if (!email.trim()) {
       newErrors.email = "Email is required";
-    } else {
-      const checkEmail =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      if (!checkEmail.test(String(email).toLowerCase())) {
-        newErrors.email = "Invalid format of  email address ";
-      }
-      if (email) {
-        data.find((user) => {
-          if (user.email === email) {
-            newErrors.email = "This email is already exist ! try with different email";
-          }
-        })
-      }
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Invalid email address";
     }
 
     if (!password.trim()) {
       newErrors.password = "Password is required";
-    } else {
-      const checkPassword =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-      if (!checkPassword.test(password)) {
-        newErrors.password = " Passwords should be like test@example.com ";
-      }
     }
-    
-    if (!confirmPass.trim()) {
-      newErrors.confirmPass = "Password is required";
-    }
-    if (confirmPass !== password) {
+
+    if (password !== confirmPass) {
       newErrors.confirmPass = "Passwords do not match";
     }
-    
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -102,7 +98,7 @@ const SignUp: React.FC<formBannerProps> = (props) => {
     e.preventDefault();
 
     if (validateForm()) {
-      const formData: any = { firstName, lastName, email, confirmPass };
+      const formData: any = { firstName, lastName, email, password, confirmPass };
 
       try {
         await dispatch(userPostData(formData));
@@ -115,16 +111,16 @@ const SignUp: React.FC<formBannerProps> = (props) => {
 
   return (
     <>
-      <div className="container-fluid">
+      <div className="container ">
         <div className="row">
           <div className="col form-wrapper">
             <div className="form-banner">
               <img className="img-fluid" src={props.image} alt="loading" />
             </div>
-            <div className="col-md-3 main-form">
+            <div className="col-md-5 main-form">
               <Form className=" ">
                 <h3 className="text-start">SignUp</h3>
-                <Form.Group className="form-field">
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>First Name</Form.Label>
                   <Form.Control
                     value={firstName}
@@ -133,9 +129,9 @@ const SignUp: React.FC<formBannerProps> = (props) => {
                     name="firstName"
                     placeholder=""
                   />
-                  <span className="error-text">{errors.firstName}</span>
+                  {errors.firstName && <span className="error-text">{errors.firstName}</span>}
                 </Form.Group>
-                <Form.Group className="form-field">
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>Last Name</Form.Label>
                   <Form.Control
                     value={lastName}
@@ -144,9 +140,9 @@ const SignUp: React.FC<formBannerProps> = (props) => {
                     name="lastName"
                     placeholder=""
                   />
-                  <span className="error-text">{errors.lastName}</span>
+                  {errors.lastName && <span className="error-text">{errors.lastName}</span>}
                 </Form.Group>
-                <Form.Group className="form-field">
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     value={email}
@@ -155,9 +151,9 @@ const SignUp: React.FC<formBannerProps> = (props) => {
                     name="email"
                     placeholder="xyz@gmail.com"
                   />
-                  <span className="error-text">{errors.email}</span>
+                  {errors.email && <span className="error-text">{errors.email}</span>}
                 </Form.Group>
-                <Form.Group className="form-field">
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     value={password}
@@ -166,9 +162,9 @@ const SignUp: React.FC<formBannerProps> = (props) => {
                     name="password"
                     placeholder=""
                   />
-                  <span className="error-text">{errors.password}</span>
+                  {errors.password && <span className="error-text">{errors.password}</span>}
                 </Form.Group>
-                <Form.Group className="form-field">
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>Confirm Password</Form.Label>
                   <Form.Control
                     value={confirmPass}
@@ -177,7 +173,7 @@ const SignUp: React.FC<formBannerProps> = (props) => {
                     name="confirmPass"
                     placeholder=""
                   />
-                  <span className="error-text">{errors.confirmPass}</span>
+                  {errors.confirmPass && <span className="error-text">{errors.confirmPass}</span>}
                 </Form.Group>
                 <Button
                   onClick={handleSubmitBtn}
@@ -204,3 +200,45 @@ const SignUp: React.FC<formBannerProps> = (props) => {
 
 export default SignUp;
 
+//  const initialValues = { username: "", email: "", password: "" };
+  const [formValues, setFormValues] = useState(initialValues);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setFormErrors(validate(formValues));
+    setIsSubmit(true);
+  };
+
+  useEffect(() => {
+    console.log(formErrors);
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+      console.log(formValues);
+    }
+  }, [formErrors]);
+  const validate = (values) => {
+    const errors = {};
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    if (!values.username) {
+      errors.username = "Username is required!";
+    }
+    if (!values.email) {
+      errors.email = "Email is required!";
+    } else if (!regex.test(values.email)) {
+      errors.email = "This is not a valid email format!";
+    }
+    if (!values.password) {
+      errors.password = "Password is required";
+    } else if (values.password.length < 4) {
+      errors.password = "Password must be more than 4 characters";
+    } else if (values.password.length > 10) {
+      errors.password = "Password cannot exceed more than 10 characters";
+    }
+    return errors;
+  };

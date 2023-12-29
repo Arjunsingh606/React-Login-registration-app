@@ -1,35 +1,87 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "../style/login.css";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { login, UserForm } from "../store/userSlice";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { RootState } from '../store/store'
+import { getUsers } from "../store/userSlice";
+import { useAppDispatch } from "../store/hooks";
 
 interface formBannerProps {
   image: string;
 }
+
 const Login: React.FC<formBannerProps> = (props) => {
 
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const loggedIn = useSelector((state: RootState) => state.user.status === "succeeded");
-  const dispatch = useDispatch();
+  const { data, status } = useSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
 
+  const user = data.find((user) => user.email === email && user.password === password);
+  console.log(user, "hfjsgfjsgfjh");
 
-  const handleLogin = (e:React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-   
-     dispatch(login( {email,password}));
-    
-    if (loggedIn) {
-      sessionStorage.setItem("userEmail", email)
-      sessionStorage.setItem("UserPassword", password);
-      window.location.href = "/home";
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const checkEmail =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      if (!checkEmail.test(String(email).toLowerCase())) {
+        newErrors.email = "Invalid format of  email address ";
+      }
     }
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    } else {
+      const checkPassword =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+      if (!checkPassword.test(password)) {
+        newErrors.password = "Enter correct password";
+      }
+    }
+
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleFieldChange = (fieldName: string, value: string) => {
+    setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: "" }));
+    switch (fieldName) {
+      case "email":
+        setEmail(value);
+        break;
+      case "password":
+        setPassword(value);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      if (user) {
+        console.log("fjhdjkhfgdjkfhjdghjk");
+        sessionStorage.setItem("userEmail", email)
+        sessionStorage.setItem("UserPassword", password);
+        window.location.href = "/home";
+      } else {
+        console.log("Invalid password")
+      }
+    }
+    await dispatch(getUsers());
   };
 
 
@@ -58,8 +110,9 @@ const Login: React.FC<formBannerProps> = (props) => {
                     name="email"
                     placeholder="xyz@gmail.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleFieldChange("email", e.target.value)}
                   />
+                  <span className="error-text">{errors.email}</span>
                 </Form.Group>
 
                 <Form.Group
@@ -78,8 +131,9 @@ const Login: React.FC<formBannerProps> = (props) => {
                     name="password"
                     placeholder=""
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => handleFieldChange("password", e.target.value)}
                   />
+                  <span className="error-text">{errors.password}</span>
                 </Form.Group>
 
                 <Button onClick={handleLogin} className="form-btn" variant="primary" type="submit">

@@ -27,7 +27,7 @@ const Otp: React.FC<formBannerProps> = (props) => {
       if (name === getotp) {
         window.location.href = "/resetPassword";
       } else {
-        console.log("enter correct otp")
+        alert("enter correct otp")
       }
     }
   };

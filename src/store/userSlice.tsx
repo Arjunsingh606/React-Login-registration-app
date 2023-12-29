@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk, Slice } from "@reduxjs/toolkit";
 
- export interface UserForm {
+export interface UserForm {
   id?: string;
   firstName?: string;
   lastName?: string;
@@ -9,17 +9,16 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
   confirmPass?: string;
 }
 
+interface loginPayload {
+  email?: string,
+  password?: string
+}
+
 interface UserState {
-  data: UserForm[] | null;
+  data: UserForm[] ;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | undefined;
 }
-
-const initialState: UserState = {
-  data: [],
-  status: "idle",
-  error:"" ,
-};
 
 
 
@@ -27,12 +26,36 @@ const initialState: UserState = {
 export const getUsers = createAsyncThunk("getUsersData", async () => {
   try {
     const response = await fetch("http://localhost:3001/user");
-    const getData = response.json();
+    const getData = await response.json();
     return getData;
   } catch (error) {
     console.log("Error", error);
   }
 });
+
+
+// update api password upate
+export const updatePassword = createAsyncThunk("userUpdatepassword", async (requestData: UserForm, id) => {
+  try {
+    const response = await fetch(`http://localhost:3001/user/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
+    });
+    return await response.json();
+  } catch (error: any) {
+    console.log(error.message, "data is not posted");
+  }
+});
+
+
+const initialState: UserState = {
+  data: [],
+  status: "idle",
+  error: "",
+}
 
 
 // post user data at api
@@ -56,40 +79,14 @@ export const userPostData = createAsyncThunk("userdata", async (requestData: Use
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {
-    // setUser: (state, action: PayloadAction<UserForm[]>) => {
-    //   state.data = action.payload;
-    // },
-    login: (state, action: PayloadAction<UserForm>) => {
-      const { email, password } = action.payload;
-      const loginUser = state.data?.filter((user) => user.email === email && user.password === password);
-
-      if (loginUser) {
-        // state.data = [loginUser];
-        state.status = "succeeded";
-      } else {
-        state.status = "failed";
-        state.error = "Invalid credentials";
-      }
-    },
-    forgetPassword:(state,action:PayloadAction<UserForm>)=>{
-      const {email} = action.payload;
-      const existEmail = state.data?.filter((user)=> user.email === email);
-      if(existEmail){
-        state.status = "succeeded"
-      }else{
-        state.status = "failed";
-        state.error = "Invalid credentials";
-      }
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(userPostData.pending, (state) => {
       state.status = "loading";
     });
-    builder.addCase(userPostData.fulfilled, (state, action: PayloadAction<UserForm[]>) => {
+    builder.addCase(userPostData.fulfilled, (state, action: PayloadAction<UserForm>) => {
       state.status = "succeeded";
-      state.data = action.payload;
+      state.data = [...state.data, action.payload];
     });
     builder.addCase(userPostData.rejected, (state, action) => {
       state.status = "failed";
@@ -98,19 +95,28 @@ const userSlice = createSlice({
     builder.addCase(getUsers.pending, (state) => {
       state.status = "loading";
     });
-    builder.addCase(getUsers.fulfilled, (state, action:PayloadAction<UserForm[]>) => {
-      state.status = "succeeded";
+    builder.addCase(getUsers.fulfilled, (state, action: PayloadAction<UserForm[]>) => {
       state.data = action.payload;
     });
     builder.addCase(getUsers.rejected, (state, action) => {
       console.log("Error", action.payload);
       state.error = action.error.message;
     });
+    builder.addCase(updatePassword.pending, (state) => {
+      state.status = "loading";
+    });
+    builder.addCase(updatePassword.fulfilled, (state, action: PayloadAction<UserForm[]>) => {
+      state.data = action.payload;
+    });
+    builder.addCase(updatePassword.rejected, (state, action) => {
+      console.log("Error", action.payload);
+      state.error = action.error.message;
+    });
   },
- 
+
 });
 
-export const {  login, forgetPassword } = userSlice.actions;
+// export const { forgetPassword } = userSlice.actions;
 export default userSlice.reducer;
 
 

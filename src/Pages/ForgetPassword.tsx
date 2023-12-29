@@ -3,9 +3,10 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import '../style/login.css'
 import { Link } from "react-router-dom";
-import { forgetPassword } from "../store/userSlice";
+import { getUsers } from "../store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '../store/store'
+import { useAppDispatch} from "../store/hooks";
 
 interface FormBannerProps {
   image: string;
@@ -15,16 +16,54 @@ const ForgetPassword: React.FC<FormBannerProps> = (props) => {
 
 
   const [email, setEmail] = useState<string>("")
-  const existUser = useSelector((state: RootState) => state.user.status === "succeeded")
-  console.log(existUser, "exist user");
-  
-  const dispatch = useDispatch()
-  const handelSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-    dispatch(forgetPassword({ email }))
-    if (existUser) {
-      window.location.href = "/otp";
+  const { data, status } = useSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch()
+  
+  const existEmail = data.find((user) => user.email === email);
+  console.log(existEmail, "logged in user");
+  
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const checkEmail =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      if (!checkEmail.test(String(email).toLowerCase())) {
+        newErrors.email = "Invalid format of  email address ";
+      }
+      // if(!existEmail){
+      //   newErrors.email = "Email is not registered ! please signup !!!";
+      // }
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const handleFieldChange = (fieldName: string, value: string) => {
+    setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: "" }));
+    switch (fieldName) {
+      case "email":
+        setEmail(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+
+
+  const handelSubmit = async(e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    if(validateForm()){
+      await dispatch(getUsers()); 
+      if (existEmail) {
+        sessionStorage.setItem("forgetPassEmail", email)
+        window.location.href = "/otp";
+      }else{
+        console.log("no email found");
+      }
     }
   }
 
@@ -50,8 +89,9 @@ const ForgetPassword: React.FC<FormBannerProps> = (props) => {
                     name="email"
                     placeholder="xyz@gmail.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleFieldChange("email", e.target.value)}
                   />
+                   <span className="error-text">{errors.email}</span>
                 </Form.Group>
                 <Button onClick={handelSubmit} className="form-btn" variant="primary" type="submit">
                   Submit
@@ -81,57 +121,3 @@ export default ForgetPassword;
 
 
 
-// import React from "react";
-// import Form from "react-bootstrap/Form";
-// import Button from "react-bootstrap/Button";
-// import '../style/login.css'
-
-// interface formBannerProps{
-//   image:JSX.Element
-// }
-
-// const ForgetPassword: React.FC<formBannerProps> = (props) => {
-//   return (
-//     <div>
-//       <div className="container ">
-//         <div className="row">
-//           <div className="form-wrapper">
-//             <div className="col-md-5 form-banner">
-//               <img src={props.image} alt="loading"></img>
-//             </div>
-//             <Form className=" col-md-4">
-//               <h3 className="text-start">Forget Your Password</h3>
-//               <p className="text-start border-bottom">
-//                 Enter the email address assciated with your account and We'll
-//                 help you to reset password.
-//               </p>
-
-//               <Form.Group className="mb-3 form-field">
-//                 <Form.Label>Email</Form.Label>
-//                 <Form.Control
-//                   type="email"
-//                   name="email"
-//                   placeholder="xyz@gmail.com"
-//                 />
-//               </Form.Group>
-
-//               <Button className="form-btn" variant="primary" type="submit">
-//                 Submit
-//               </Button>
-//               <div className="sign-up-link">
-//                 <p>
-//                   Already a member?
-//                   <a href="forget.html" className="link-underline-light ">
-//                     Login now
-//                   </a>
-//                 </p>
-//               </div>
-//             </Form>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ForgetPassword;

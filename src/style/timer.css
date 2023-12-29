@@ -11,3 +11,16 @@
     padding: 4px 15px;
 
 }
+.home-btn{
+    border: none;
+    background-color: rgb(193 87 34);
+    border-radius: 5px;
+    color: #fff;
+    padding: 4px 10px;
+}
+.user-table{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+}
