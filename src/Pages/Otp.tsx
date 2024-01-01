@@ -9,17 +9,18 @@ import { useNavigate } from 'react-router-dom';
 interface formBannerProps {
   image: string;
 }
-export interface GetOtp {
-  getOtp: string | undefined;
-}
+// export interface GetOtp {
+//   getOtp: string | undefined;
+// }
 const Otp: React.FC<formBannerProps> =(props) => {
   const input = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-
+  
   const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
-  const otpDigit = generateOtp();
+  const [otpDigit, setOtpDigit] = useState(generateOtp());
+
 
   const handleSubmitOtp = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -32,6 +33,9 @@ const Otp: React.FC<formBannerProps> =(props) => {
         alert("Enter correct otp");
       }
     }
+  };
+  const handleResendOtp = () => {
+    setOtpDigit(generateOtp());
   };
 
   return (
@@ -49,7 +53,7 @@ const Otp: React.FC<formBannerProps> =(props) => {
                 <h3 className="text-start">OTP verification</h3>
                 
                 <div>
-                  <Timer otpDigit={otpDigit} otpNumber={generateOtp} />
+                  <Timer otpDigit={otpDigit} otpNumber={handleResendOtp} />
                 </div>
 
 

@@ -77,6 +77,9 @@ body {
   padding-left: 0;
   padding-right: 0;
 }
+.has-error .form-control {
+  border-color: red;
+}
 /* media query */
 @media screen and (max-width: 1600px) {
 }

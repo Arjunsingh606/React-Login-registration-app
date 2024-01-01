@@ -1,123 +1,142 @@
 import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { useAppDispatch } from "../store/hooks";
-import { userPostData } from "../store/userSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { userPostData, loginUser } from "../store/userSlice";
 import "../style/login.css";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { loginUser } from "../store/userSlice";
 
 interface formBannerProps {
   image: string;
 }
 
 const SignUp: React.FC<formBannerProps> = (props) => {
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPass, setConfirmPass] = useState<string>("");
+  const [user, setUser] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPass: "",
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const userData = useSelector((state: RootState) => state.user.data);
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  const userData = useAppSelector((state: RootState) => state.user.data);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(loginUser());
-  }, [loginUser]);
+  }, [dispatch]);
 
-  const dispatch = useAppDispatch();
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (!firstName.trim()) {
-      newErrors.firstName = "First Name is required";
-    }
-    if (!lastName.trim()) {
-      newErrors.lastName = "Last Name is required";
-    }
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else {
+  const validationRules: Record<string, (value: string) => string> = {
+    firstName: (value) => (value.trim() ? "" : "First Name is required"),
+    lastName: (value) => (value.trim() ? "" : "Last Name is required"),
+    email: (value) => {
+      if (!value.trim()) {
+        return "Email is required";
+      }
       const checkEmail =
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if (!checkEmail.test(String(email).toLowerCase())) {
-        newErrors.email = "Invalid format of  email address ";
+      if (!checkEmail.test(String(value).toLowerCase())) {
+        return "Invalid format of email address";
       }
-      if (email) {
-        userData.find((user) => {
-          if (user.email === email) {
-            newErrors.email =
-              "This email is already exist ! try with different email";
-          }
-        });
+      if (value && userData.some((user) => user.email === value)) {
+        return "This email already exists! Try with a different email";
       }
-    }
-
-    if (!password.trim()) {
-      newErrors.password = "Password is required";
+      return "";
+    },
+    password: (value) => {
+      if (!value.trim()) {
+        return "Password is required";
+      }
+      const checkPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+      return checkPassword.test(value)
+        ? ""
+        : "Passwords should be like 'test@1234'";
+    },
+    confirmPass: (value) => {
+      if (!value.trim()) {
+        return "Password is required";
+      }
+      return value === user.password ? "" : "Passwords do not match";
+    },
+  };
+  
+  const validateForm = (fieldName?: string, value?: string) => {
+    const newErrors: Record<string, string> = {};
+  
+    if (fieldName && value !== undefined) {
+      const key = fieldName as keyof typeof user;
+      const error = validationRules[key](value);
+      newErrors[key] = error;
     } else {
-      const checkPassword =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-      if (!checkPassword.test(password)) {
-        newErrors.password = " Passwords should be like 'test@1234' ";
-      }
+      Object.keys(user).forEach((field) => {
+        const key = field as keyof typeof user;
+        const error = validationRules[key](user[key]);
+        newErrors[key] = error;
+  
+        if (touchedFields[key] && user[key].trim() === "") {
+          newErrors[key] = validationRules[key](user[key]);
+        }
+      });
     }
-
-    if (!confirmPass.trim()) {
-      newErrors.confirmPass = "Password is required";
-    }
-    if (confirmPass !== password) {
-      newErrors.confirmPass = "Passwords do not match";
-    }
-
+  
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setTouchedFields((prevTouched) => ({
+      ...prevTouched,
+      [fieldName as string]: true,
+    }));
+    return Object.values(newErrors).every((error) => error === "");
+  };
+  
+  const isInvalid = (fieldName: string) => {
+    return touchedFields[fieldName] && errors[fieldName] !== undefined && errors[fieldName] !== "";
   };
 
   const handleFieldChange = (fieldName: string, value: string) => {
-    setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: "" }));
-    switch (fieldName) {
-      case "firstName":
-        setFirstName(value);
-        break;
-      case "lastName":
-        setLastName(value);
-        break;
-      case "email":
-        setEmail(value);
-        break;
-      case "password":
-        setPassword(value);
-        break;
-      case "confirmPass":
-        setConfirmPass(value);
-        break;
-      default:
-        break;
-    }
+    setUser((prevUser) => ({ ...prevUser, [fieldName]: value }));
+    validateForm(fieldName, value);
+    setTouchedFields((prevTouched) => ({ ...prevTouched, [fieldName]: true }));
   };
+
 
   const handleSubmitBtn = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
+    setTouchedFields({
+      firstName: true,
+      lastName: true,
+      email: true,
+      password: true,
+      confirmPass: true,
+    });
+
     if (validateForm()) {
-      const formData: any = { firstName, lastName, email, confirmPass };
-
       try {
-        await dispatch(userPostData(formData));
+        const { password, ...userDetails } = user;
+        await dispatch(userPostData(userDetails));
 
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setPassword("");
-        setConfirmPass("");
-        alert("Registration is successfull, You can login now");
+        setUser({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          confirmPass: "",
+        });
+
+        setTouchedFields({});
+        setErrors({});
+        alert("Registration is successful. You can log in now");
       } catch (error) {
         console.error("Error while saving data", error);
       }
     }
   };
+
+
+  
 
   return (
     <>
@@ -129,90 +148,87 @@ const SignUp: React.FC<formBannerProps> = (props) => {
             </div>
           </div>
           <div className="col-md-4 form-size">
-          <div className=" main-form">
-            <Form className=" ">
-              <h3 className="text-start">SignUp</h3>
-              <Form.Group className="form-field">
-                <Form.Label>First Name</Form.Label>
-                <Form.Control
-                  value={firstName}
-                  onChange={(e) =>
-                    handleFieldChange("firstName", e.target.value)
-                  }
-                  type="text"
-                  name="firstName"
-                  placeholder=""
-                />
-                <span className="error-text">{errors.firstName}</span>
-              </Form.Group>
-              <Form.Group className="form-field">
-                <Form.Label>Last Name</Form.Label>
-                <Form.Control
-                  value={lastName}
-                  onChange={(e) =>
-                    handleFieldChange("lastName", e.target.value)
-                  }
-                  type="text"
-                  name="lastName"
-                  placeholder=""
-                />
-                <span className="error-text">{errors.lastName}</span>
-              </Form.Group>
-              <Form.Group className="form-field">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  value={email}
-                  onChange={(e) => handleFieldChange("email", e.target.value)}
-                  type="email"
-                  name="email"
-                  placeholder="xyz@gmail.com"
-                />
-                <span className="error-text">{errors.email}</span>
-              </Form.Group>
-              <Form.Group className="form-field">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  value={password}
-                  onChange={(e) =>
-                    handleFieldChange("password", e.target.value)
-                  }
-                  type="password"
-                  name="password"
-                  placeholder=""
-                />
-                <span className="error-text">{errors.password}</span>
-              </Form.Group>
-              <Form.Group className="form-field">
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control
-                  value={confirmPass}
-                  onChange={(e) =>
-                    handleFieldChange("confirmPass", e.target.value)
-                  }
-                  type="password"
-                  name="confirmPass"
-                  placeholder=""
-                />
-                <span className="error-text">{errors.confirmPass}</span>
-              </Form.Group>
-              <Button
-                onClick={handleSubmitBtn}
-                className="form-btn"
-                variant="primary"
-                type="submit"
-              >
-                Sign Up
-              </Button>
-              <div className="sign-up-link">
-                Already a member?
-                <span>
-                  <Link to="/"> Login now </Link>
-                </span>
-              </div>
-            </Form>
+            <div className="main-form">
+              <Form className=" ">
+                <h3 className="text-start">SignUp</h3>
+                <Form.Group className={`form-field ${isInvalid("firstName") ? "has-error" : ""}`}>
+                  <Form.Label>First Name</Form.Label>
+                  <Form.Control
+                    value={user.firstName}
+                    onChange={(e) => handleFieldChange("firstName", e.target.value)}
+                    type="text"
+                    name="firstName"
+                    placeholder=""
+                  />
+                  <span className="error-text">{errors.firstName}</span>
+                </Form.Group>
+                <Form.Group className={`form-field ${isInvalid("lastName") ? "has-error" : ""}`}>
+                  <Form.Label>Last Name</Form.Label>
+                  <Form.Control
+                    value={user.lastName}
+                    onChange={(e) =>
+                      handleFieldChange("lastName", e.target.value)
+                    }
+                    type="text"
+                    name="lastName"
+                    placeholder=""
+                  />
+                  <span className="error-text">{errors.lastName}</span>
+                </Form.Group>
+                <Form.Group className={`form-field ${isInvalid("email") ? "has-error" : ""}`}>
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    value={user.email}
+                    onChange={(e) => handleFieldChange("email", e.target.value)}
+                    type="email"
+                    name="email"
+                    placeholder="xyz@gmail.com"
+                  />
+                  <span className="error-text">{errors.email}</span>
+                </Form.Group>
+                <Form.Group className={`form-field ${isInvalid("password") ? "has-error" : ""}`}>
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                    value={user.password}
+                    onChange={(e) =>
+                      handleFieldChange("password", e.target.value)
+                    }
+                    type="password"
+                    name="password"
+                    placeholder=""
+                  />
+                  <span className="error-text">{errors.password}</span>
+                </Form.Group>
+                <Form.Group className={`form-field ${isInvalid("confirmPass") ? "has-error" : ""}`}>
+                  <Form.Label>Confirm Password</Form.Label>
+                  <Form.Control
+                    value={user.confirmPass}
+                    onChange={(e) =>
+                      handleFieldChange("confirmPass", e.target.value)
+                    }
+                    type="password"
+                    name="confirmPass"
+                    placeholder=""
+                  />
+                  <span className="error-text">{errors.confirmPass}</span>
+                </Form.Group>
+                <Button
+                  onClick={handleSubmitBtn}
+                  className="form-btn"
+                  variant="primary"
+                  type="submit"
+                >
+                  Sign Up
+                </Button>
+                <div className="sign-up-link">
+                  Already a member?
+                  <span>
+                    <Link to="/"> Login now </Link>
+                  </span>
+                </div>
+              </Form>
+            </div>
           </div>
-          </div>
-          
         </div>
       </div>
     </>
