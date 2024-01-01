@@ -1,53 +1,57 @@
-import React, {useRef } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "../style/login.css";
 import { Link } from "react-router-dom";
 import Timer from "../components/Timer";
+import { useNavigate } from 'react-router-dom';
 
 interface formBannerProps {
   image: string;
- 
 }
-
-const Otp: React.FC<formBannerProps> = (props) => {
-
-  const input = useRef<HTMLInputElement>(null)
+export interface GetOtp {
+  getOtp: string | undefined;
+}
+const Otp: React.FC<formBannerProps> =(props) => {
+  const input = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
-  const getotp = generateOtp();
- 
+  const otpDigit = generateOtp();
+
   const handleSubmitOtp = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (input.current !== null) {
       const name = input.current.value;
-      if (name === getotp) {
-        window.location.href = "/resetPassword";
+      if (name === otpDigit) {
+        navigate('/resetPassword');
       } else {
-        alert("enter correct otp")
+        alert("Enter correct otp");
       }
     }
   };
 
   return (
     <>
-      <div className="container-fluid ">
-        <div className="row">
-          <div className="col form-wrapper">
+     <div className="container-fluid form-body">
+        <div className="row user-form">
+          <div className="col-md-6 form-size form-banner">
             <div className="form-banner">
-              <img src={props.image} alt="loading"></img>
+              <img className="img-fluid" src={props.image} alt="loading" />
             </div>
-            <div className="col-md-3 main-form">
+          </div>
+          <div className="col-md-4 form-size">
+          <div className=" main-form">
               <Form>
                 <h3 className="text-start">OTP verification</h3>
-                <p className="otp-text">{getotp}</p>
-                <div >
-                  <Timer otpNumber={getotp}/>
-                  
+                
+                <div>
+                  <Timer otpDigit={otpDigit} otpNumber={generateOtp} />
                 </div>
+
 
                 <Form.Group
                   className="mb-3 form-field"
@@ -55,15 +59,14 @@ const Otp: React.FC<formBannerProps> = (props) => {
                 >
                   <Form.Label>Enter 6 digit OTP</Form.Label>
                   <Form.Control
-
                     type="text"
                     name="otp"
                     placeholder=""
                     ref={input}
+                  // value={otp}
+                  // onChange={otpValue}
                   />
                 </Form.Group>
-
-
 
                 <Button
                   onClick={handleSubmitOtp}
@@ -91,4 +94,3 @@ const Otp: React.FC<formBannerProps> = (props) => {
 };
 
 export default Otp;
-

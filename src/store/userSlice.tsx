@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction, createAsyncThunk, Slice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
-export interface UserForm {
+ interface UserForm {
   id?: string;
   firstName?: string;
   lastName?: string;
@@ -9,60 +9,42 @@ export interface UserForm {
   confirmPass?: string;
 }
 
-interface loginPayload {
-  email?: string,
-  password?: string
-}
-
 interface UserState {
-  data: UserForm[] ;
+  data: UserForm[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | undefined;
 }
 
-
-
-// // get user data from api
-export const getUsers = createAsyncThunk("getUsersData", async () => {
-  try {
-    const response = await fetch("http://localhost:3001/user");
-    const getData = await response.json();
-    return getData;
-  } catch (error) {
-    console.log("Error", error);
-  }
-});
-
-
-// update api password upate
-export const updatePassword = createAsyncThunk("userUpdatepassword", async (requestData: UserForm, id) => {
-  try {
-    const response = await fetch(`http://localhost:3001/user/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    });
-    return await response.json();
-  } catch (error: any) {
-    console.log(error.message, "data is not posted");
-  }
-});
-
-
-const initialState: UserState = {
-  data: [],
-  status: "idle",
-  error: "",
+interface User {
+  email?: string;
+  password?: string;
+}
+interface resetPassPayload {
+  userId: string;
+  confirmPass: string;
 }
 
+const initialState: UserState = {
+  data: [] ,
+  status: "idle",
+  error: "",
+};
 
-// post user data at api
+
+
+// fetching data for login functionality
+export const loginUser = createAsyncThunk('user/loginUser', async () => {
+    const response = await fetch('http://localhost:3001/user');
+    const users: User[] = await response.json();
+    return users;
+});
+
+// post user data on api
 export const userPostData = createAsyncThunk("userdata", async (requestData: UserForm) => {
   try {
     const response = await fetch("http://localhost:3001/user", {
       method: "POST",
+    
       headers: {
         "Content-Type": "application/json",
       },
@@ -74,9 +56,24 @@ export const userPostData = createAsyncThunk("userdata", async (requestData: Use
   }
 });
 
+ // update api (reset password)
+export const resetPassword = createAsyncThunk('user/resetPassword', async ({ userId, confirmPass }: resetPassPayload) => {
+  try {
+    const response = await fetch(`http://localhost:3001/user/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ confirmPass: confirmPass }),
+    });
+    return await response.json();
+  } catch (error) {
+   console.log(error, "error")
+  }
+});
 
 
-const userSlice = createSlice({
+export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {},
@@ -84,39 +81,37 @@ const userSlice = createSlice({
     builder.addCase(userPostData.pending, (state) => {
       state.status = "loading";
     });
-    builder.addCase(userPostData.fulfilled, (state, action: PayloadAction<UserForm>) => {
+    builder.addCase(userPostData.fulfilled, (state, action: PayloadAction<UserForm[]>) => {
       state.status = "succeeded";
-      state.data = [...state.data, action.payload];
+      state.data = action.payload;
     });
     builder.addCase(userPostData.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message;
     });
-    builder.addCase(getUsers.pending, (state) => {
-      state.status = "loading";
+    builder.addCase(loginUser.pending, (state) => {
+        state.status = 'loading';
+    })
+    builder.addCase(loginUser.fulfilled, (state, action: PayloadAction<User[]>) => {
+        state.status = 'succeeded';
+        state.data = action.payload;
+    })
+    builder.addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
+        state.status = 'failed';
     });
-    builder.addCase(getUsers.fulfilled, (state, action: PayloadAction<UserForm[]>) => {
-      state.data = action.payload;
+    builder.addCase(resetPassword.pending, (state) => {
+        state.status = 'loading';
     });
-    builder.addCase(getUsers.rejected, (state, action) => {
-      console.log("Error", action.payload);
-      state.error = action.error.message;
+    builder.addCase(resetPassword.fulfilled, (state, action:PayloadAction<any>) => {
+        state.status = 'succeeded';
+        state.data = action.payload;
     });
-    builder.addCase(updatePassword.pending, (state) => {
-      state.status = "loading";
+    builder.addCase(resetPassword.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
     });
-    builder.addCase(updatePassword.fulfilled, (state, action: PayloadAction<UserForm[]>) => {
-      state.data = action.payload;
-    });
-    builder.addCase(updatePassword.rejected, (state, action) => {
-      console.log("Error", action.payload);
-      state.error = action.error.message;
-    });
+  
   },
-
 });
 
-// export const { forgetPassword } = userSlice.actions;
 export default userSlice.reducer;
-
-

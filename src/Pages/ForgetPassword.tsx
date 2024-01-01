@@ -1,46 +1,38 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import '../style/login.css'
+import "../style/login.css";
 import { Link } from "react-router-dom";
-import { getUsers } from "../store/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from '../store/store'
-import { useAppDispatch} from "../store/hooks";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { loginUser } from "../store/userSlice";
+import { useAppDispatch } from "../store/hooks";
+import { useNavigate } from 'react-router-dom';
 
 interface FormBannerProps {
   image: string;
 }
 
 const ForgetPassword: React.FC<FormBannerProps> = (props) => {
-
-
-  const [email, setEmail] = useState<string>("")
+  const [email, setEmail] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { data, status } = useSelector((state: RootState) => state.user);
-  const dispatch = useAppDispatch()
-  
-  const existEmail = data.find((user) => user.email === email);
-  console.log(existEmail, "logged in user");
-  
+  const user = useSelector((state: RootState) => state.user.data);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const loggedInUser = user.find((user) => user.email === email);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
     if (!email.trim()) {
       newErrors.email = "Email is required";
-    } else {
-      const checkEmail =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      if (!checkEmail.test(String(email).toLowerCase())) {
-        newErrors.email = "Invalid format of  email address ";
-      }
-      // if(!existEmail){
-      //   newErrors.email = "Email is not registered ! please signup !!!";
-      // }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleFieldChange = (fieldName: string, value: string) => {
     setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: "" }));
     switch (fieldName) {
@@ -52,20 +44,21 @@ const ForgetPassword: React.FC<FormBannerProps> = (props) => {
     }
   };
 
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
 
+    if (validateForm()) {
+      await dispatch(loginUser());
 
-  const handelSubmit = async(e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    if(validateForm()){
-      await dispatch(getUsers()); 
-      if (existEmail) {
-        sessionStorage.setItem("forgetPassEmail", email)
-        window.location.href = "/otp";
-      }else{
-        console.log("no email found");
+      if (loggedInUser) {
+        const userId: any = loggedInUser.id;
+        sessionStorage.setItem("userId", userId);
+        navigate('/otp');
+      } else {
+        console.log("This email is not registered ! try with valid email");
       }
     }
-  }
+  };
 
   return (
     <div>
@@ -83,7 +76,7 @@ const ForgetPassword: React.FC<FormBannerProps> = (props) => {
                   help you to reset password.
                 </p>
                 <Form.Group className="mb-3 form-field">
-                  <Form.Label htmlFor="email">Email</Form.Label>
+                  <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
                     name="email"
@@ -91,19 +84,28 @@ const ForgetPassword: React.FC<FormBannerProps> = (props) => {
                     value={email}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
                   />
-                   <span className="error-text">{errors.email}</span>
+                  {errors.email && (
+                    <span className="error-text">{errors.email}</span>
+                  )}
                 </Form.Group>
-                <Button onClick={handelSubmit} className="form-btn" variant="primary" type="submit">
+                <Button
+                  onClick={handleSubmit}
+                  className="form-btn"
+                  variant="primary"
+                  type="submit"
+                >
                   Submit
                 </Button>
                 <div className="sign-up-link">
-                  <p>Not a member?
-                    <span><Link to="/signUp"> Sign up</Link></span>
+                  <p>
+                    Not a member?
+                    <span>
+                      <Link to="/signUp"> Sign up</Link>
+                    </span>
                   </p>
                 </div>
               </Form>
             </div>
-
           </div>
         </div>
       </div>
@@ -112,12 +114,3 @@ const ForgetPassword: React.FC<FormBannerProps> = (props) => {
 };
 
 export default ForgetPassword;
-
-
-
-
-
-
-
-
-

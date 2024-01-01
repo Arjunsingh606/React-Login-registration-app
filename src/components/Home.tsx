@@ -2,53 +2,57 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../store/hooks";
 import { Table } from "react-bootstrap";
-import { getUsers } from "../store/userSlice";
+import { loginUser } from "../store/userSlice";
 import { RootState } from "../store/store";
 import '../style/timer.css'
+import { useNavigate } from 'react-router-dom';
+
 
 const Home: React.FC = () => {
-  const { data, status } = useSelector((state: RootState) => state.user);
+  const { data } = useSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
-  const loggedInUser = sessionStorage.getItem("userEmail");
+  const navigate = useNavigate();
+
   useEffect(() => {
-    dispatch(getUsers());
-  }, [getUsers]);
-
-
-  const handleLoggOut = () => {
+    dispatch(loginUser());
+  }, []);
+ 
+  const handleLogOut = () => {
     sessionStorage.removeItem("userEmail");
-    window.location.href = "/";
+    navigate('/');
+
   }
 
   return (
     <>
       <div className="container">
-        <div className="row"></div>
-        <div className="col">
-          <div className="user-table">
-            <h3 className="text-center m-4">Users Table</h3>
-            <button onClick={handleLoggOut} className="home-btn">Log out</button>
-          </div>
-          <Table striped bordered table-responsive hover>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.firstName}</td>
-                  <td>{user.lastName}</td>
-                  <td>{user.email}</td>
+        <div className="row">
+          <div className="col">
+            <div className="user-table">
+              <h3 className="text-center m-4">Users Table</h3>
+              <button onClick={handleLogOut} className="home-btn">Log out</button>
+            </div>
+            <Table striped bordered hover table-responsive="true">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {data.map((user, index) => (
+                  <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.firstName}</td>
+                    <td>{user.lastName}</td>
+                    <td>{user.email}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
         </div>
       </div>
     </>

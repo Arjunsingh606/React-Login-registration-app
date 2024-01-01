@@ -4,7 +4,11 @@
     align-items:flex-start;
 }
 
-.timer-text button{
+.otp-btn {
+    display: flex;
+    justify-content: end;
+}
+.otp-btn button{
     border: none;
     background-color: antiquewhite;
     border-radius: 5px;

@@ -1,132 +1,121 @@
-import React, { useState, useEffect } from "react";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import "../style/login.css";
+import React, { useState } from "react";
+import { Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { resetPassword } from "../store/userSlice";
 import { useAppDispatch } from "../store/hooks";
-import { RootState } from "../store/store";
-import { updatePassword,getUsers } from "../store/userSlice";
+import { useNavigate } from 'react-router-dom';
 
-interface formBannerProps {
+interface ResetPasswordProps {
   image: string;
 }
 
-const ResetPassword: React.FC<formBannerProps> = (props) => {
-  const [newPass, setNewPass] = useState<string>("");
+const ResetPassword: React.FC<ResetPasswordProps> = (props) => {
+  const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPass, setConfirmPass] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const userId = sessionStorage.getItem("userId") || "";
+
   const dispatch = useAppDispatch();
-  const { data, status } = useSelector((state: RootState) => state.user);
-  useEffect(() => {
-    dispatch(getUsers());
-  }, [getUsers]);
+  const navigate = useNavigate();
 
-  const userEmail = sessionStorage.getItem("userEmail");
-
-  const user = data.find((user) => user.email === userEmail);
-  console.log(user);
-  
-   
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!newPass.trim()) {
-      newErrors.newPass = "Password is required";
+
+    if (!newPassword.trim()) {
+      newErrors.newPassword = "Password is required";
     } else {
-      const checkPassword =
+      const checkNewPassword =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-      if (!checkPassword.test(newPass)) {
-        newErrors.newPass = "Enter correct password";
+      if (!checkNewPassword.test(newPassword)) {
+        newErrors.newPassword = "Passwords should be like 'test@example.com'";
       }
     }
-    if (!confirmPass ) {
+    if (!confirmPass.trim()) {
       newErrors.confirmPass = "Password is required";
     }
-    if (confirmPass !== newPass) {
-      newErrors.confirmPass = "Passwords do not match";
+    if (newPassword !== confirmPass) {
+      newErrors.confirmPass = "Password do not match";
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleFieldChange = (fieldName: string, value: string) => {
     setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: "" }));
     switch (fieldName) {
-      case "newPass":
-        setNewPass(value);
+      case "newPassword":
+        setNewPassword(value);
         break;
       case "confirmPass":
         setConfirmPass(value);
         break;
+
       default:
         break;
     }
   };
 
-  const handleUpdate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // await dispatch(updatePassword());
-      if (user) {
-        window.location.href = "/home";
-      } else {
-        console.log("Invalid password");
+      try {
+        await dispatch(resetPassword({ userId, confirmPass }));
+        alert("Password changed successfully");
+        navigate('/');
+      } catch (error) {
+        console.error("Password reset failed", error);
       }
     }
   };
 
   return (
     <>
-      <div className="container-fluid ">
-        <div className="row">
-          <div className="col form-wrapper">
-            <div className=" form-banner">
-              <img src={props.image} alt="loading"></img>
+       <div className="container-fluid form-body">
+        <div className="row user-form">
+          <div className="col-md-6 form-size form-banner">
+            <div className="form-banner">
+              <img className="img-fluid" src={props.image} alt="loading" />
             </div>
-            <div className="col-md-3 main-form">
-              <Form>
+          </div>
+          <div className="col-md-4 form-size">
+          <div className=" main-form">
+              <Form onSubmit={handleSubmit}>
                 <h3 className="text-start">Reset Password</h3>
 
-                <Form.Group
-                  className="mb-3 form-field"
-                  controlId="formBasicPassword1"
-                >
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>New Password</Form.Label>
                   <Form.Control
                     type="password"
+                    name="new-password"
                     placeholder=""
-                    value={newPass}
-                    autoComplete="on"
+                    value={newPassword}
                     onChange={(e) =>
-                      handleFieldChange("newPass", e?.target?.value)
+                      handleFieldChange("newPassword", e.target.value)
                     }
                   />
-                  <span className="error-text">{errors.newPass}</span>
+                  <span className="error-text">{errors.newPassword}</span>
                 </Form.Group>
 
-                <Form.Group
-                  className="mb-3 form-field"
-                  controlId="formBasicPassword"
-                >
+                <Form.Group className="mb-3 form-field">
                   <Form.Label>Confirm Password</Form.Label>
                   <Form.Control
                     type="password"
+                    name="confirm-password"
                     placeholder=""
-                    autoComplete="confirm-password"
                     value={confirmPass}
-                    onChange={(e) => handleFieldChange("confirmPass", e.target.value) }
+                    onChange={(e) =>
+                      handleFieldChange("confirmPass", e.target.value)
+                    }
                   />
-                   <span className="error-text">{errors.confirmPass}</span>
+                  <span className="error-text">{errors.confirmPass}</span>
                 </Form.Group>
 
-                <Button
-                  onClick={handleUpdate}
-                  className="form-btn"
-                  variant="primary"
-                  type="submit"
-                >
+                <Button className="form-btn" variant="primary" type="submit">
                   Submit
                 </Button>
+
                 <div className="sign-up-link">
                   <p>
                     Not a member?
@@ -136,7 +125,6 @@ const ResetPassword: React.FC<formBannerProps> = (props) => {
                   </p>
                 </div>
               </Form>
-             
             </div>
           </div>
         </div>
