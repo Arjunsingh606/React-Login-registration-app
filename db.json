@@ -152,6 +152,13 @@
       "email": "filanako@mailinator.com",
       "confirmPass": "Pa$$w0rd!",
       "id": 87
+    },
+    {
+      "firstName": "Nevada",
+      "lastName": "Rivas",
+      "email": "gevo@mailinator.com",
+      "confirmPass": "Arjun@qq11",
+      "id": 88
     }
   ]
 }
